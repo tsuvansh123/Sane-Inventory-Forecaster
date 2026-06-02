@@ -52,7 +52,8 @@ if st.sidebar.button("Generate AI Forecast"):
     with st.spinner("Calculating AI predictions via FastAPI..."):
         try:
             # Send POST request to your local server
-            response = requests.post("http://127.0.0.1:8000/predict", json=payload)
+            # Send POST request to the Render server
+            response = requests.post("https://sane-inventory-forecaster.onrender.com/predict", json=payload)
             
             if response.status_code == 200:
                 data = response.json()
