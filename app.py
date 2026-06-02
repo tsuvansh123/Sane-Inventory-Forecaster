@@ -4,7 +4,7 @@ import requests
 # 1. Configure the page settings
 st.set_page_config(page_title="WFX Inventory Dashboard", page_icon="📦", layout="wide")
 
-st.title("📦 WFX Intelligent Inventory Forecaster")
+st.title("📦 SANE Inventory Forecaster")
 st.markdown("Predictive analytics dashboard for apparel supply chain optimization.")
 st.markdown("---")
 
