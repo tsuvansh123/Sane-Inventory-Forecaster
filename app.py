@@ -1,6 +1,7 @@
 import streamlit as st
 import requests
 import pandas as pd
+import plotly.graph_objects as go # <-- New Plotly Import
 
 # --- 1. Configure the page settings ---
 st.set_page_config(page_title="WFX Inventory Dashboard", page_icon="📦", layout="wide")
@@ -22,7 +23,6 @@ if "logged_in" not in st.session_state:
 # --- 4. Login Page Function ---
 def login_page():
     col1, col2, col3 = st.columns([1, 1, 1]) 
-    
     with col2:
         st.markdown("<h1 style='text-align: center; color: #1E3A8A;'>📦 WFX Forecaster</h1>", unsafe_allow_html=True)
         st.markdown("<p style='text-align: center; color: #6B7280; margin-bottom: 20px;'>Enterprise Inventory Intelligence</p>", unsafe_allow_html=True)
@@ -31,7 +31,6 @@ def login_page():
             st.markdown("### Secure Login")
             username = st.text_input("Username", placeholder="Enter your username")
             password = st.text_input("Password", type="password", placeholder="Enter your password")
-            
             st.write("") 
             submit_button = st.form_submit_button("Sign In", use_container_width=True)
 
@@ -51,7 +50,6 @@ def login_page():
                             st.error("Access Denied: Invalid credentials.")
                         else:
                             st.error(f"Server Error: {response.status_code}")
-                            
                     except Exception as e:
                         st.error(f"Failed to connect to backend server. Error: {e}")
 
@@ -112,6 +110,50 @@ def main_dashboard():
                         res_col2.metric(label="Current Stock", value=data["current_stock"])
                         res_col3.metric(label="Suggested Reorder Qty", value=data["suggested_reorder_quantity"])
                         
+                        # --- NEW PLOTLY CHART VISUALIZATION ---
+                        st.markdown("### Demand Trend Analysis")
+                        
+                        # Create x-axis labels
+                        days = ["30 Days Ago", "14 Days Ago", "7 Days Ago", "Today", "Predicted (Next 30 Days)"]
+                        # Create y-axis data combining historical inputs and the AI prediction
+                        sales_trend = [lag_30, lag_14, lag_7, rolling_mean_7, data["predicted_30_day_demand"]]
+                        
+                        # Build the high-contrast chart
+                        fig = go.Figure()
+                        
+                        # Historical Data Line
+                        fig.add_trace(go.Scatter(
+                            x=days[:4], y=sales_trend[:4],
+                            mode='lines+markers',
+                            name='Historical Sales',
+                            line=dict(color='#6B7280', width=3),
+                            marker=dict(size=8)
+                        ))
+                        
+                        # AI Prediction Line (Bright highlight color)
+                        fig.add_trace(go.Scatter(
+                            x=days[3:], y=sales_trend[3:],
+                            mode='lines+markers',
+                            name='AI Forecast',
+                            line=dict(color='#3B82F6', width=4, dash='dot'),
+                            marker=dict(size=10, symbol='star')
+                        ))
+                        
+                        # Deep, cinematic layout styling
+                        fig.update_layout(
+                            paper_bgcolor='rgba(0,0,0,0)',
+                            plot_bgcolor='rgba(10,10,10,0.5)',
+                            font=dict(color='#E5E7EB'),
+                            xaxis=dict(showgrid=False),
+                            yaxis=dict(gridcolor='#374151', title="Units Sold / Demanded"),
+                            margin=dict(l=0, r=0, t=30, b=0)
+                        )
+                        
+                        # Render the chart in Streamlit
+                        st.plotly_chart(fig, use_container_width=True)
+                        st.markdown("---")
+                        # --------------------------------------
+
                         st.markdown("### Status Alert")
                         if data["inventory_status"] == "Stockout Risk High":
                             st.error("🚨 CRITICAL: Stockout Risk High. Immediate reorder recommended.")
@@ -145,9 +187,8 @@ def main_dashboard():
                             res = requests.post("https://sane-inventory-forecaster.onrender.com/predict", json=payload)
                             if res.status_code == 200:
                                 results.append(res.json())
-                        except Exception:
+                        except Exception as e:
                             pass 
-                        
                         progress_bar.progress((index + 1) / len(df))
                 
                 if results:
