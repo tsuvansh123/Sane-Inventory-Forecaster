@@ -18,12 +18,9 @@ except FileNotFoundError:
 
 # 3. Define the exact data structure the model expects
 class SkuData(BaseModel):
-    # Business logic fields (used by the API, but not sent to the ML model)
     item_id: int
     current_stock: int
     lead_time_days: int
-    
-    # Machine Learning fields (The exact 9 features XGBoost expects)
     day_of_week: int
     month: int
     day_of_year: int
@@ -46,16 +43,13 @@ def read_root():
 # 5. The secure login endpoint
 @app.post("/login")
 def login(credentials: LoginCredentials):
-    # For a portfolio project, a hardcoded check here is perfectly fine.
-    # In a real app, this would query a SQL database.
     if credentials.username == "admin" and credentials.password == "admin123":
         return {
             "status": "success", 
             "message": "Authentication successful", 
-            "token": "wfx-auth-token-789" # Simulated security token
+            "token": "wfx-auth-token-789"
         }
     else:
-        # If credentials fail, return a 401 Unauthorized error
         raise HTTPException(status_code=401, detail="Invalid username or password")
 
 # 6. The core prediction endpoint
@@ -64,8 +58,6 @@ def predict_demand(data: SkuData):
     if model is None:
         return {"error": "Machine learning model is not loaded."}
 
-    # Format the incoming data exactly with the 9 columns the model was trained on
-    # Notice we DO NOT include 'item' or 'store' here anymore
     input_df = pd.DataFrame([{
         'day_of_week': data.day_of_week,
         'month': data.month,
@@ -78,10 +70,8 @@ def predict_demand(data: SkuData):
         'rolling_mean_30': data.rolling_mean_30
     }])
     
-    # Generate the prediction
     prediction = model.predict(input_df)[0]
     
-    # Calculate reorder logic
     predicted_demand = max(0, int(prediction))
     reorder_point = predicted_demand * (data.lead_time_days / 30.0)
     suggested_order = max(0, int(reorder_point - data.current_stock))

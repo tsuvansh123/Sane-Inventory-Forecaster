@@ -21,7 +21,6 @@ if "logged_in" not in st.session_state:
 
 # --- 4. Login Page Function ---
 def login_page():
-    # Using columns to center the login box in your 'wide' layout
     col1, col2, col3 = st.columns([1, 1, 1]) 
     
     with col2:
@@ -39,7 +38,6 @@ def login_page():
             if submit_button:
                 with st.spinner("Authenticating..."):
                     try:
-                        # Call your FastAPI login endpoint
                         login_url = "https://sane-inventory-forecaster.onrender.com/login" 
                         payload = {"username": username, "password": password}
                         response = requests.post(login_url, json=payload)
@@ -59,7 +57,6 @@ def login_page():
 
 # --- 5. Main Dashboard Function ---
 def main_dashboard():
-    # Sidebar layout strictly for account actions
     with st.sidebar:
         st.markdown("### Account")
         if st.button("Sign Out", use_container_width=True):
@@ -71,7 +68,6 @@ def main_dashboard():
     st.markdown("Predictive analytics dashboard for apparel supply chain optimization.")
     st.markdown("---")
 
-    # Create two tabs for the Enterprise UI
     tab1, tab2 = st.tabs(["Single Item Forecast", "Bulk CSV Upload"])
 
     # --- TAB 1: Single Item Logic ---
@@ -109,7 +105,6 @@ def main_dashboard():
                     
                     if response.status_code == 200:
                         data = response.json()
-                        
                         st.subheader(f"Forecast Results for Item #{data['item_id']}")
                         
                         res_col1, res_col2, res_col3 = st.columns(3)
@@ -135,7 +130,6 @@ def main_dashboard():
         uploaded_file = st.file_uploader("Upload Inventory CSV", type=["csv"])
         
         if uploaded_file is not None:
-            # Read the CSV using Pandas
             df = pd.read_csv(uploaded_file)
             st.write("Preview of Uploaded Data:")
             st.dataframe(df.head()) 
@@ -145,17 +139,15 @@ def main_dashboard():
                 progress_bar = st.progress(0)
                 
                 with st.spinner("Processing bulk records through FastAPI..."):
-                    # Loop through each row in the uploaded CSV
                     for index, row in df.iterrows():
                         payload = row.to_dict()
                         try:
                             res = requests.post("https://sane-inventory-forecaster.onrender.com/predict", json=payload)
                             if res.status_code == 200:
                                 results.append(res.json())
-                        except Exception as e:
+                        except Exception:
                             pass 
                         
-                        # Update progress bar
                         progress_bar.progress((index + 1) / len(df))
                 
                 if results:
@@ -163,7 +155,6 @@ def main_dashboard():
                     results_df = pd.DataFrame(results)
                     st.dataframe(results_df)
                     
-                    # Create a downloadable CSV of the AI predictions
                     csv_export = results_df.to_csv(index=False).encode('utf-8')
                     st.download_button(
                         label="Download AI Forecast Report (CSV)",
