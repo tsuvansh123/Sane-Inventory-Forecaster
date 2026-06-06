@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import joblib
 import pandas as pd
@@ -34,11 +34,31 @@ class SkuData(BaseModel):
     rolling_mean_7: float
     rolling_mean_30: float
 
+# 4. Define the data structure for the login request
+class LoginCredentials(BaseModel):
+    username: str
+    password: str
+
 @app.get("/")
 def read_root():
     return {"status": "API is live and ready."}
 
-# 4. The core prediction endpoint
+# 5. The secure login endpoint
+@app.post("/login")
+def login(credentials: LoginCredentials):
+    # For a portfolio project, a hardcoded check here is perfectly fine.
+    # In a real app, this would query a SQL database.
+    if credentials.username == "admin" and credentials.password == "admin123":
+        return {
+            "status": "success", 
+            "message": "Authentication successful", 
+            "token": "wfx-auth-token-789" # Simulated security token
+        }
+    else:
+        # If credentials fail, return a 401 Unauthorized error
+        raise HTTPException(status_code=401, detail="Invalid username or password")
+
+# 6. The core prediction endpoint
 @app.post("/predict")
 def predict_demand(data: SkuData):
     if model is None:
