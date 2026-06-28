@@ -17,7 +17,7 @@ hide_st_style = """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
 # --- ALL API calls go here — change this one line to swap local vs live ---
-API_BASE = "http://localhost:8000"
+API_BASE = "https://sane-inventory-forecaster.onrender.com"
 
 # --- 3. Initialize Session State ---
 if "logged_in" not in st.session_state:

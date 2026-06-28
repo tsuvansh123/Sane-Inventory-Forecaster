@@ -104,7 +104,7 @@ def predict_demand(data: SkuData):
 def query_forecast(request: QueryRequest):
     """
     Receives the user's plain-English question + the /predict results,
-    passes both to Gemini 2.0 Flash, returns a plain-English answer.
+    passes both to Gemini, returns a plain-English answer.
     Called by the 'Ask AI Analyst' tab in the Streamlit frontend.
     """
     if not request.forecast_data:
