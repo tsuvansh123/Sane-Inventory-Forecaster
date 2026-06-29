@@ -4,7 +4,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 # --- 1. Configure the page settings ---
-st.set_page_config(page_title="WFX Inventory Dashboard", page_icon="📦", layout="wide")
+st.set_page_config(page_title="SANE Inventory Dashboard", page_icon="📦", layout="wide")
 
 # --- 2. Hide Streamlit Branding ---
 hide_st_style = """
@@ -25,22 +25,112 @@ if "logged_in" not in st.session_state:
 
 # --- 4. Login Page Function ---
 def login_page():
-    col1, col2, col3 = st.columns([1, 1, 1])
-    with col2:
-        st.markdown("<h1 style='text-align: center; color: #1E3A8A;'>📦 SANE Forecaster</h1>", unsafe_allow_html=True)
-        st.markdown("<p style='text-align: center; color: #6B7280; margin-bottom: 20px;'>Enterprise Inventory Intelligence</p>", unsafe_allow_html=True)
+    st.markdown("""
+    <style>
+    .login-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 420px;
+        border: 1px solid #2D3748;
+        border-radius: 12px;
+        overflow: hidden;
+        max-width: 820px;
+        margin: 60px auto 0 auto;
+    }
+    .login-left {
+        background: #1A202C;
+        padding: 2.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+    .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+        margin-top: 2rem;
+    }
+    .stat-box {
+        background: #0F1117;
+        border: 1px solid #2D3748;
+        border-radius: 8px;
+        padding: 10px 12px;
+        text-align: center;
+    }
+    .feature-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        color: #9CA3AF;
+        margin-bottom: 10px;
+    }
+    .security-badge {
+        background: #064E3B;
+        border: 1px solid #065F46;
+        border-radius: 8px;
+        padding: 10px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 1rem;
+    }
+    </style>
 
+    <div class="login-wrapper">
+        <div class="login-left">
+            <div>
+                <div style="display:flex; align-items:center; gap:10px; margin-bottom:1.5rem;">
+                    <span style="font-size:24px;">📦</span>
+                    <span style="font-size:16px; font-weight:600; color:#F9FAFB;">SANE Forecaster</span>
+                </div>
+                <p style="font-size:20px; font-weight:600; color:#F9FAFB; line-height:1.4; margin-bottom:0.75rem;">
+                    Apparel supply chain intelligence
+                </p>
+                <p style="font-size:13px; color:#9CA3AF; line-height:1.6; margin-bottom:1.5rem;">
+                    Predict demand. Prevent stockouts.<br>Powered by XGBoost and Gemini AI.
+                </p>
+                <div class="feature-item">✦ &nbsp;30-day demand forecasting</div>
+                <div class="feature-item">✦ &nbsp;Gemini AI natural language analyst</div>
+                <div class="feature-item">✦ &nbsp;Bulk CSV batch processing</div>
+            </div>
+            <div class="stat-grid">
+                <div class="stat-box">
+                    <div style="font-size:18px; font-weight:600; color:#60A5FA;">30d</div>
+                    <div style="font-size:11px; color:#6B7280; margin-top:2px;">forecast</div>
+                </div>
+                <div class="stat-box">
+                    <div style="font-size:18px; font-weight:600; color:#60A5FA;">XGB</div>
+                    <div style="font-size:11px; color:#6B7280; margin-top:2px;">ML model</div>
+                </div>
+                <div class="stat-box">
+                    <div style="font-size:18px; font-weight:600; color:#60A5FA;">AI</div>
+                    <div style="font-size:11px; color:#6B7280; margin-top:2px;">powered</div>
+                </div>
+            </div>
+        </div>
+        <div style="background:#0F1117; padding:2.5rem;">
+            <p style="font-size:20px; font-weight:600; color:#F9FAFB; margin-bottom:0.25rem;">Sign in</p>
+            <p style="font-size:13px; color:#6B7280; margin-bottom:0.5rem;">Enter your credentials to continue</p>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    col1, col2, col3 = st.columns([1.2, 1, 1.2])
+    with col2:
         with st.form("login_form", clear_on_submit=True):
-            st.markdown("### Secure Login")
             username = st.text_input("Username", placeholder="Enter your username")
             password = st.text_input("Password", type="password", placeholder="Enter your password")
             st.write("")
-            submit_button = st.form_submit_button("Sign In", use_container_width=True)
+            submit_button = st.form_submit_button("Sign In →", use_container_width=True)
 
             if submit_button:
                 with st.spinner("Authenticating..."):
                     try:
-                        response = requests.post(f"{API_BASE}/login", json={"username": username, "password": password})
+                        response = requests.post(
+                            f"{API_BASE}/login",
+                            json={"username": username, "password": password}
+                        )
                         if response.status_code == 200:
                             data = response.json()
                             if data.get("status") == "success":
@@ -51,7 +141,14 @@ def login_page():
                         else:
                             st.error(f"Server Error: {response.status_code}")
                     except Exception as e:
-                        st.error(f"Failed to connect to backend server. Error: {e}")
+                        st.error(f"Failed to connect to backend. Error: {e}")
+
+        st.markdown("""
+        <div class="security-badge">
+            <span style="color:#34D399; font-size:16px;">🛡</span>
+            <span style="font-size:12px; color:#6EE7B7;">Enterprise-grade secure login</span>
+        </div>
+        """, unsafe_allow_html=True)
 
 
 # --- 5. Main Dashboard Function ---
@@ -199,7 +296,7 @@ def main_dashboard():
                     st.download_button(
                         label="Download AI Forecast Report (CSV)",
                         data=csv_export,
-                        file_name="wfx_bulk_forecast_results.csv",
+                        file_name="sane_bulk_forecast_results.csv",
                         mime="text/csv",
                     )
 
