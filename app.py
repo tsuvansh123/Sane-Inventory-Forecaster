@@ -27,7 +27,7 @@ if "logged_in" not in st.session_state:
 def login_page():
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
-        st.markdown("<h1 style='text-align: center; color: #1E3A8A;'>📦 WFX Forecaster</h1>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center; color: #1E3A8A;'>📦 SANE Forecaster</h1>", unsafe_allow_html=True)
         st.markdown("<p style='text-align: center; color: #6B7280; margin-bottom: 20px;'>Enterprise Inventory Intelligence</p>", unsafe_allow_html=True)
 
         with st.form("login_form", clear_on_submit=True):
