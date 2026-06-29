@@ -12,11 +12,45 @@ hide_st_style = """
             #MainMenu {visibility: hidden;}
             footer {visibility: hidden;}
             header {visibility: hidden;}
+
+            /* Style the right column to look like a dark panel */
+            [data-testid="column"]:nth-child(2) {
+                background: #0F1117;
+                border: 1px solid #2D3748;
+                border-radius: 12px;
+                padding: 2rem !important;
+            }
+
+            /* Make form inputs bigger */
+            .stTextInput input {
+                font-size: 15px !important;
+                padding: 12px !important;
+            }
+
+            /* Make form labels bigger */
+            .stTextInput label {
+                font-size: 15px !important;
+                color: #D1D5DB !important;
+            }
+
+            /* Sign in button */
+            .stFormSubmitButton button {
+                background: #2563EB !important;
+                color: white !important;
+                border: none !important;
+                font-size: 16px !important;
+                font-weight: 600 !important;
+                padding: 12px !important;
+                border-radius: 8px !important;
+            }
+            .stFormSubmitButton button:hover {
+                background: #1D4ED8 !important;
+            }
             </style>
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
-# --- ALL API calls go here — change this one line to swap local vs live ---
+# --- ALL API calls go here ---
 API_BASE = "https://sane-inventory-forecaster.onrender.com"
 
 # --- 3. Initialize Session State ---
@@ -25,99 +59,69 @@ if "logged_in" not in st.session_state:
 
 # --- 4. Login Page Function ---
 def login_page():
-    st.markdown("""
-    <style>
-    .login-wrapper {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        min-height: 420px;
-        border: 1px solid #2D3748;
-        border-radius: 12px;
-        overflow: hidden;
-        max-width: 820px;
-        margin: 60px auto 0 auto;
-    }
-    .login-left {
-        background: #1A202C;
-        padding: 2.5rem;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-    }
-    .stat-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 8px;
-        margin-top: 2rem;
-    }
-    .stat-box {
-        background: #0F1117;
-        border: 1px solid #2D3748;
-        border-radius: 8px;
-        padding: 10px 12px;
-        text-align: center;
-    }
-    .feature-item {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-size: 14px;
-        color: #9CA3AF;
-        margin-bottom: 10px;
-    }
-    .security-badge {
-        background: #064E3B;
-        border: 1px solid #065F46;
-        border-radius: 8px;
-        padding: 10px 12px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        margin-top: 1rem;
-    }
-    </style>
 
-    <div class="login-wrapper">
-        <div class="login-left">
+    st.markdown("<div style='margin-top: 30px;'></div>", unsafe_allow_html=True)
+
+    left_col, right_col = st.columns([1, 1], gap="medium")
+
+    # ── LEFT PANEL — branding ────────────────────────────────────────────
+    with left_col:
+        st.markdown("""
+        <div style="
+            background: #1A202C;
+            border: 1px solid #2D3748;
+            border-radius: 12px;
+            padding: 2.5rem;
+            min-height: 480px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        ">
             <div>
-                <div style="display:flex; align-items:center; gap:10px; margin-bottom:1.5rem;">
-                    <span style="font-size:24px;">📦</span>
-                    <span style="font-size:16px; font-weight:600; color:#F9FAFB;">SANE Forecaster</span>
+                <div style="display:flex; align-items:center; gap:12px; margin-bottom:1.5rem;">
+                    <span style="font-size:30px;">📦</span>
+                    <span style="font-size:20px; font-weight:700; color:#F9FAFB;">SANE Forecaster</span>
                 </div>
-                <p style="font-size:20px; font-weight:600; color:#F9FAFB; line-height:1.4; margin-bottom:0.75rem;">
+                <div style="font-size:26px; font-weight:700; color:#F9FAFB; line-height:1.4; margin-bottom:0.75rem;">
                     Apparel supply chain intelligence
-                </p>
-                <p style="font-size:13px; color:#9CA3AF; line-height:1.6; margin-bottom:1.5rem;">
-                    Predict demand. Prevent stockouts.<br>Powered by XGBoost and Gemini AI.
-                </p>
-                <div class="feature-item">✦ &nbsp;30-day demand forecasting</div>
-                <div class="feature-item">✦ &nbsp;Gemini AI natural language analyst</div>
-                <div class="feature-item">✦ &nbsp;Bulk CSV batch processing</div>
+                </div>
+                <div style="font-size:15px; color:#9CA3AF; line-height:1.7; margin-bottom:1.75rem;">
+                    Predict demand. Prevent stockouts.<br>
+                    Powered by XGBoost and Gemini AI.
+                </div>
+                <div style="font-size:15px; color:#9CA3AF; margin-bottom:12px; display:flex; align-items:center; gap:10px;">
+                    ✦ &nbsp; 30-day demand forecasting
+                </div>
+                <div style="font-size:15px; color:#9CA3AF; margin-bottom:12px; display:flex; align-items:center; gap:10px;">
+                    ✦ &nbsp; Gemini AI natural language analyst
+                </div>
+                <div style="font-size:15px; color:#9CA3AF; margin-bottom:12px; display:flex; align-items:center; gap:10px;">
+                    ✦ &nbsp; Bulk CSV batch processing
+                </div>
             </div>
-            <div class="stat-grid">
-                <div class="stat-box">
-                    <div style="font-size:18px; font-weight:600; color:#60A5FA;">30d</div>
-                    <div style="font-size:11px; color:#6B7280; margin-top:2px;">forecast</div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:2rem;">
+                <div style="background:#0F1117; border:1px solid #2D3748; border-radius:8px; padding:16px 12px; text-align:center;">
+                    <div style="font-size:24px; font-weight:700; color:#60A5FA;">30d</div>
+                    <div style="font-size:12px; color:#6B7280; margin-top:4px;">forecast window</div>
                 </div>
-                <div class="stat-box">
-                    <div style="font-size:18px; font-weight:600; color:#60A5FA;">XGB</div>
-                    <div style="font-size:11px; color:#6B7280; margin-top:2px;">ML model</div>
+                <div style="background:#0F1117; border:1px solid #2D3748; border-radius:8px; padding:16px 12px; text-align:center;">
+                    <div style="font-size:24px; font-weight:700; color:#60A5FA;">XGB</div>
+                    <div style="font-size:12px; color:#6B7280; margin-top:4px;">ML model</div>
                 </div>
-                <div class="stat-box">
-                    <div style="font-size:18px; font-weight:600; color:#60A5FA;">AI</div>
-                    <div style="font-size:11px; color:#6B7280; margin-top:2px;">powered</div>
+                <div style="background:#0F1117; border:1px solid #2D3748; border-radius:8px; padding:16px 12px; text-align:center;">
+                    <div style="font-size:24px; font-weight:700; color:#60A5FA;">AI</div>
+                    <div style="font-size:12px; color:#6B7280; margin-top:4px;">powered chat</div>
                 </div>
             </div>
         </div>
-        <div style="background:#0F1117; padding:2.5rem;">
-            <p style="font-size:20px; font-weight:600; color:#F9FAFB; margin-bottom:0.25rem;">Sign in</p>
-            <p style="font-size:13px; color:#6B7280; margin-bottom:0.5rem;">Enter your credentials to continue</p>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns([1.2, 1, 1.2])
-    with col2:
+    # ── RIGHT PANEL — form only ──────────────────────────────────────────
+    with right_col:
+        st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:28px; font-weight:700; color:#F9FAFB; margin-bottom:4px;'>Sign in</p>", unsafe_allow_html=True)
+        st.markdown("<p style='font-size:15px; color:#6B7280; margin-bottom:1.5rem;'>Enter your credentials to continue</p>", unsafe_allow_html=True)
+
         with st.form("login_form", clear_on_submit=True):
             username = st.text_input("Username", placeholder="Enter your username")
             password = st.text_input("Password", type="password", placeholder="Enter your password")
@@ -144,9 +148,18 @@ def login_page():
                         st.error(f"Failed to connect to backend. Error: {e}")
 
         st.markdown("""
-        <div class="security-badge">
-            <span style="color:#34D399; font-size:16px;">🛡</span>
-            <span style="font-size:12px; color:#6EE7B7;">Enterprise-grade secure login</span>
+        <div style="
+            background: #064E3B;
+            border: 1px solid #065F46;
+            border-radius: 8px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 1rem;
+        ">
+            <span style="font-size:18px;">🛡</span>
+            <span style="font-size:14px; color:#6EE7B7;">Enterprise-grade secure login</span>
         </div>
         """, unsafe_allow_html=True)
 
@@ -204,15 +217,11 @@ def main_dashboard():
             with st.spinner("Calculating AI predictions via FastAPI..."):
                 try:
                     response = requests.post(f"{API_BASE}/predict", json=payload)
-
                     if response.status_code == 200:
                         data = response.json()
-
-                        # Save for Tab 3 chat
                         st.session_state["last_single_forecast"] = data
 
                         st.subheader(f"Forecast Results for Item #{data['item_id']}")
-
                         res_col1, res_col2, res_col3 = st.columns(3)
                         res_col1.metric(label="Predicted 30-Day Demand", value=data["predicted_30_day_demand"])
                         res_col2.metric(label="Current Stock", value=data["current_stock"])
@@ -287,10 +296,7 @@ def main_dashboard():
                 if results:
                     st.success("Batch Processing Complete!")
                     results_df = pd.DataFrame(results)
-
-                    # Save for Tab 3 chat
                     st.session_state["bulk_forecast_results"] = results_df.to_dict(orient="records")
-
                     st.dataframe(results_df)
                     csv_export = results_df.to_csv(index=False).encode("utf-8")
                     st.download_button(
@@ -322,10 +328,7 @@ def main_dashboard():
                 ["Single Item (Tab 1)", "Bulk Results (Tab 2)"],
                 horizontal=True
             )
-            if data_source == "Single Item (Tab 1)":
-                data_for_chat = [st.session_state["last_single_forecast"]]
-            else:
-                data_for_chat = st.session_state["bulk_forecast_results"]
+            data_for_chat = [st.session_state["last_single_forecast"]] if data_source == "Single Item (Tab 1)" else st.session_state["bulk_forecast_results"]
         elif has_single:
             st.info("Using your **Single Item** forecast from Tab 1.")
             data_for_chat = [st.session_state["last_single_forecast"]]
@@ -333,7 +336,6 @@ def main_dashboard():
             st.info("Using your **Bulk CSV** forecast results from Tab 2.")
             data_for_chat = st.session_state["bulk_forecast_results"]
 
-        # Suggested question buttons
         st.markdown("**Try asking:**")
         q_col1, q_col2, q_col3 = st.columns(3)
         suggested = [
@@ -348,7 +350,6 @@ def main_dashboard():
 
         st.markdown("---")
 
-        # Chat history
         if "chat_history" not in st.session_state:
             st.session_state["chat_history"] = []
 
@@ -370,10 +371,7 @@ def main_dashboard():
                     try:
                         response = requests.post(
                             f"{API_BASE}/query",
-                            json={
-                                "question": final_question,
-                                "forecast_data": data_for_chat
-                            }
+                            json={"question": final_question, "forecast_data": data_for_chat}
                         )
                         if response.status_code == 200:
                             answer = response.json()["answer"]
@@ -381,7 +379,6 @@ def main_dashboard():
                             answer = f"API returned an error ({response.status_code}): {response.text}"
                     except Exception as e:
                         answer = f"Could not reach the backend: {e}"
-
                     st.write(answer)
 
             st.session_state["chat_history"].append({"role": "assistant", "content": answer})
