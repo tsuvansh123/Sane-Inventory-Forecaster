@@ -4,12 +4,12 @@ from typing import List, Any
 import joblib
 import pandas as pd
 import os
-from google import genai
+from groq import Groq
 from dotenv import load_dotenv
 
-# ── Load .env file (reads GEMINI_API_KEY) ─────────────────────────────────
+# ── Load .env file ─────────────────────────────────────────────────────────
 load_dotenv()
-gemini_client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
+groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
 # 1. Initialize the application
 app = FastAPI(
@@ -44,7 +44,7 @@ class LoginCredentials(BaseModel):
     username: str
     password: str
 
-# 5. Define the data structure for the Gemini chat endpoint
+# 5. Define the data structure for the AI chat endpoint
 class QueryRequest(BaseModel):
     question: str
     forecast_data: List[Any]
@@ -99,24 +99,20 @@ def predict_demand(data: SkuData):
         "inventory_status": status
     }
 
-# 8. Gemini AI chat endpoint
+# 8. AI chat endpoint — powered by Groq + LLaMA 3.1
 @app.post("/query")
 def query_forecast(request: QueryRequest):
     """
     Receives the user's plain-English question + the /predict results,
-    passes both to Gemini, returns a plain-English answer.
-    Called by the 'Ask AI Analyst' tab in the Streamlit frontend.
+    passes both to LLaMA 3.1 via Groq, returns a plain-English answer.
     """
     if not request.forecast_data:
         raise HTTPException(status_code=400, detail="No forecast data provided.")
 
-    # Convert forecast results into a readable table for Gemini
     df = pd.DataFrame(request.forecast_data)
     forecast_table = df.to_string(index=False)
 
-    # The prompt we send to Gemini
-    prompt = f"""
-You are a senior inventory analyst for an apparel supply chain company called WFX.
+    prompt = f"""You are a senior inventory analyst for an apparel supply chain company called SANE.
 
 You have been given the following XGBoost demand forecast results:
 
@@ -138,14 +134,13 @@ Instructions:
 - If the question is about risk, list the top 3 highest-risk SKUs by item_id.
 - If you cannot answer from the data alone, say so clearly.
 - Keep your answer under 180 words.
-- End with one short actionable recommendation if relevant.
-"""
+- End with one short actionable recommendation if relevant."""
 
     try:
-        response = gemini_client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt
+        response = groq_client.chat.completions.create(
+            model="llama-3.1-8b-instant",
+            messages=[{"role": "user", "content": prompt}]
         )
-        return {"answer": response.text}
+        return {"answer": response.choices[0].message.content}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Gemini error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Groq error: {str(e)}")

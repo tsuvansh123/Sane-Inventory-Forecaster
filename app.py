@@ -51,7 +51,7 @@ hide_st_style = """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
 # --- ALL API calls go here ---
-API_BASE = "https://sane-inventory-forecaster.onrender.com"
+API_BASE = "http://localhost:8000"
 
 # --- 3. Initialize Session State ---
 if "logged_in" not in st.session_state:
@@ -311,7 +311,7 @@ def main_dashboard():
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     with tab3:
         st.header("🤖 AI Inventory Analyst")
-        st.caption("Powered by Gemini · Ask anything about your forecast in plain English.")
+        st.caption("Powered by Groq · Ask anything about your forecast in plain English.")
 
         has_single = "last_single_forecast" in st.session_state
         has_bulk   = "bulk_forecast_results" in st.session_state
