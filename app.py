@@ -13,7 +13,6 @@ hide_st_style = """
             footer {visibility: hidden;}
             header {visibility: hidden;}
 
-            /* Style the right column to look like a dark panel */
             [data-testid="column"]:nth-child(2) {
                 background: #0F1117;
                 border: 1px solid #2D3748;
@@ -21,19 +20,16 @@ hide_st_style = """
                 padding: 2rem !important;
             }
 
-            /* Make form inputs bigger */
             .stTextInput input {
                 font-size: 15px !important;
                 padding: 12px !important;
             }
 
-            /* Make form labels bigger */
             .stTextInput label {
                 font-size: 15px !important;
                 color: #D1D5DB !important;
             }
 
-            /* Sign in button */
             .stFormSubmitButton button {
                 background: #2563EB !important;
                 color: white !important;
@@ -64,7 +60,6 @@ def login_page():
 
     left_col, right_col = st.columns([1, 1], gap="medium")
 
-    # ── LEFT PANEL — branding ────────────────────────────────────────────
     with left_col:
         st.markdown("""
         <div style="
@@ -116,7 +111,6 @@ def login_page():
         </div>
         """, unsafe_allow_html=True)
 
-    # ── RIGHT PANEL — form only ──────────────────────────────────────────
     with right_col:
         st.markdown("<div style='height: 30px;'></div>", unsafe_allow_html=True)
         st.markdown("<p style='font-size:28px; font-weight:700; color:#F9FAFB; margin-bottom:4px;'>Sign in</p>", unsafe_allow_html=True)
@@ -183,9 +177,6 @@ def main_dashboard():
         "🤖 Ask AI Analyst"
     ])
 
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    # TAB 1: Single Item
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     with tab1:
         st.header("Manual Parameter Entry")
 
@@ -264,9 +255,6 @@ def main_dashboard():
                 except Exception as e:
                     st.error(f"Connection Error: {e}")
 
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    # TAB 2: Bulk Upload
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     with tab2:
         st.header("Bulk Batch Processing")
         st.info("Upload a CSV file containing historical data for multiple SKUs to generate a batch forecast report.")
@@ -306,9 +294,6 @@ def main_dashboard():
                         mime="text/csv",
                     )
 
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    # TAB 3: Groq AI Chat
-    # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     with tab3:
         st.header("🤖 AI Inventory Analyst")
         st.caption("Powered by Groq · Ask anything about your forecast in plain English.")
@@ -369,9 +354,10 @@ def main_dashboard():
             with st.chat_message("assistant"):
                 with st.spinner("Groq is analysing your forecast..."):
                     try:
+                        clean_question = final_question.encode('ascii', errors='ignore').decode('ascii')
                         response = requests.post(
                             f"{API_BASE}/query",
-                            json={"question": final_question, "forecast_data": data_for_chat}
+                            json={"question": clean_question, "forecast_data": data_for_chat}
                         )
                         if response.status_code == 200:
                             answer = response.json()["answer"]
