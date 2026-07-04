@@ -51,7 +51,7 @@ hide_st_style = """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
 # --- ALL API calls go here ---
-API_BASE = "http://localhost:8000"
+API_BASE = "https://sane-inventory-forecaster.onrender.com"
 
 # --- 3. Initialize Session State ---
 if "logged_in" not in st.session_state:
@@ -87,13 +87,13 @@ def login_page():
                 </div>
                 <div style="font-size:15px; color:#9CA3AF; line-height:1.7; margin-bottom:1.75rem;">
                     Predict demand. Prevent stockouts.<br>
-                    Powered by XGBoost and Gemini AI.
+                    Powered by XGBoost and Groq.
                 </div>
                 <div style="font-size:15px; color:#9CA3AF; margin-bottom:12px; display:flex; align-items:center; gap:10px;">
                     ✦ &nbsp; 30-day demand forecasting
                 </div>
                 <div style="font-size:15px; color:#9CA3AF; margin-bottom:12px; display:flex; align-items:center; gap:10px;">
-                    ✦ &nbsp; Gemini AI natural language analyst
+                    ✦ &nbsp; Groq AI natural language analyst
                 </div>
                 <div style="font-size:15px; color:#9CA3AF; margin-bottom:12px; display:flex; align-items:center; gap:10px;">
                     ✦ &nbsp; Bulk CSV batch processing
@@ -307,7 +307,7 @@ def main_dashboard():
                     )
 
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    # TAB 3: Gemini AI Chat
+    # TAB 3: Groq AI Chat
     # ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     with tab3:
         st.header("🤖 AI Inventory Analyst")
@@ -367,7 +367,7 @@ def main_dashboard():
                 st.write(final_question)
 
             with st.chat_message("assistant"):
-                with st.spinner("Gemini is analysing your forecast..."):
+                with st.spinner("Groq is analysing your forecast..."):
                     try:
                         response = requests.post(
                             f"{API_BASE}/query",
