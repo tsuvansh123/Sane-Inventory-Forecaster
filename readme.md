@@ -7,6 +7,9 @@ Forecasts 30-day inventory demand using XGBoost and lets non-technical stakehold
 query predictions in plain English via a Groq-powered conversational interface.
 
 **Live Demo** → https://sane-inventory-forecaster-dlwabvruvol5bardxhdfaz.streamlit.app/
+Credentials for login page
+username- admin
+password- admin123
 
 ---
 
