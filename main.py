@@ -129,7 +129,7 @@ A business user has asked:
 "{request.question}"
 
 Instructions:
-- Answer in plain English — no jargon, no code, no markdown formatting.
+- Answer in plain English, no jargon, no code, no markdown formatting.
 - Be specific: reference actual item_id numbers and quantities from the data above.
 - If the question is about risk, list the top 3 highest-risk SKUs by item_id.
 - If you cannot answer from the data alone, say so clearly.
@@ -137,9 +137,10 @@ Instructions:
 - End with one short actionable recommendation if relevant."""
 
     try:
+        clean_prompt = prompt.encode('ascii', errors='ignore').decode('ascii')
         response = groq_client.chat.completions.create(
             model="llama-3.1-8b-instant",
-            messages=[{"role": "user", "content": prompt}]
+            messages=[{"role": "user", "content": clean_prompt}]
         )
         return {"answer": response.choices[0].message.content}
     except Exception as e:
