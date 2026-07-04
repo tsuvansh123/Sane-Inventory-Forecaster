@@ -110,7 +110,7 @@ def query_forecast(request: QueryRequest):
         raise HTTPException(status_code=400, detail="No forecast data provided.")
 
     df = pd.DataFrame(request.forecast_data)
-    forecast_table = df.to_string(index=False)
+    forecast_table = df.to_string(index=False).encode('ascii', errors='ignore').decode('ascii')
 
     prompt = f"""You are a senior inventory analyst for an apparel supply chain company called SANE.
 
