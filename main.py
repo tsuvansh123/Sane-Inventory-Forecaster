@@ -95,7 +95,9 @@ def query_forecast(request: QueryRequest):
         raise HTTPException(status_code=400, detail="No forecast data provided.")
 
     df = pd.DataFrame(request.forecast_data)
-    forecast_table = df.to_string(index=False)
+
+    # Fix: encode to ASCII to prevent Groq encoding errors
+    forecast_table = df.to_string(index=False).encode('ascii', errors='ignore').decode('ascii')
 
     prompt = (
         "You are a senior inventory analyst for an apparel supply chain company called SANE.\n\n"
@@ -105,17 +107,21 @@ def query_forecast(request: QueryRequest):
         "- item_id: the SKU number\n"
         "- predicted_30_day_demand: units expected to be sold in next 30 days\n"
         "- current_stock: units currently in the warehouse\n"
-        "- suggested_reorder_quantity: how many units to order now\n"
+        "- suggested_reorder_quantity: how many units to order now (0 = no action needed)\n"
         "- inventory_status: Stockout Risk High means urgent reorder needed\n\n"
         "A business user has asked: " + request.question + "\n\n"
-        "Answer in plain English. Be specific with item_id numbers. Keep under 180 words."
+        "Instructions:\n"
+        "- Answer in plain English, no jargon, no code.\n"
+        "- Be specific: reference actual item_id numbers and quantities.\n"
+        "- If about risk, list top 3 highest-risk SKUs.\n"
+        "- Keep under 180 words.\n"
+        "- End with one short actionable recommendation."
     )
 
     try:
-        clean_prompt = prompt.encode('utf-8').decode('utf-8')
         response = groq_client.chat.completions.create(
             model="llama-3.1-8b-instant",
-            messages=[{"role": "user", "content": clean_prompt}],
+            messages=[{"role": "user", "content": prompt}],
             max_tokens=300
         )
         return {"answer": response.choices[0].message.content}
