@@ -109,7 +109,7 @@ def query_forecast(request: QueryRequest):
         "- current_stock: units currently in the warehouse\n"
         "- suggested_reorder_quantity: how many units to order now (0 = no action needed)\n"
         "- inventory_status: Stockout Risk High means urgent reorder needed\n\n"
-        "A business user has asked: " + request.question + "\n\n"
+        "A business user has asked: " + request.question.encode('ascii', errors='ignore').decode('ascii') + "\n\n"
         "Instructions:\n"
         "- Answer in plain English, no jargon, no code.\n"
         "- Be specific: reference actual item_id numbers and quantities.\n"
