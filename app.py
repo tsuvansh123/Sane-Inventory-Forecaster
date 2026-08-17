@@ -3,10 +3,8 @@ import requests
 import pandas as pd
 import plotly.graph_objects as go
 
-# --- 1. Configure the page settings ---
 st.set_page_config(page_title="SANE Inventory Dashboard", page_icon="📦", layout="wide")
 
-# --- 2. Hide Streamlit Branding ---
 hide_st_style = """
             <style>
             #MainMenu {visibility: hidden;}
@@ -46,18 +44,13 @@ hide_st_style = """
             """
 st.markdown(hide_st_style, unsafe_allow_html=True)
 
-# --- ALL API calls go here ---
 API_BASE = "https://sane-inventory-forecaster.onrender.com"
 
-# --- 3. Initialize Session State ---
 if "logged_in" not in st.session_state:
     st.session_state["logged_in"] = False
 
-# --- 4. Login Page Function ---
 def login_page():
-
     st.markdown("<div style='margin-top: 30px;'></div>", unsafe_allow_html=True)
-
     left_col, right_col = st.columns([1, 1], gap="medium")
 
     with left_col:
@@ -157,8 +150,6 @@ def login_page():
         </div>
         """, unsafe_allow_html=True)
 
-
-# --- 5. Main Dashboard Function ---
 def main_dashboard():
     with st.sidebar:
         st.markdown("### Account")
@@ -354,10 +345,9 @@ def main_dashboard():
             with st.chat_message("assistant"):
                 with st.spinner("Groq is analysing your forecast..."):
                     try:
-                        clean_question = final_question.encode('ascii', errors='ignore').decode('ascii')
                         response = requests.post(
                             f"{API_BASE}/query",
-                            json={"question": clean_question, "forecast_data": data_for_chat}
+                            json={"question": final_question, "forecast_data": data_for_chat}
                         )
                         if response.status_code == 200:
                             answer = response.json()["answer"]
@@ -374,8 +364,6 @@ def main_dashboard():
                 st.session_state["chat_history"] = []
                 st.rerun()
 
-
-# --- 6. Main Routing Logic ---
 if not st.session_state.get("logged_in", False):
     login_page()
 else:
